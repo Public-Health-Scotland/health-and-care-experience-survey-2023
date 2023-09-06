@@ -21,3 +21,5 @@ outputs/
 # R data files #
 *.[rR][dD][aA][tT][aA]
 *.[rR][dD][sS]
+# parquet files #
+*.[pP][aA][rR][qQ][uU][eE][tT]
