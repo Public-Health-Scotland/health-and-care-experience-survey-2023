@@ -23,30 +23,15 @@
 
 #Note: 28/04/2022 updated after production of the info_questions_sg to create a fuller version of the output including more variables. info_output_full
 
-# load in libraries
-library(tidyverse)
-#version 1.3.1
-library(haven)
-#version 2.5.1
-library(openxlsx)
-#version 4.2.5.2
+source("00.set_up_packages.R")
+source("00.set_up_file_paths.R")
+source("00.functions.R")
 
-#Define directories
-setwd("/conf/bss/pat-exp-surveys/health-and-care/202324")
-###set vector of report areas
-report_areas <- c("scotland","gp_prac_no","practice_hscp_code","practice_board_code" ,"practice_hscp_cluster")
-report_areas_output <- c("Scotland","GP","HSCP","Health Board" ,"GPCL")
-###set vector of information question numbers
-information_questions <- readRDS("lookups/information_questions.rds")
-information_questions_tata <- readRDS("lookups/information_questions_tata.rds")
 #read in results longer data####
 responses_longer <- readRDS("output/analysis_output/responses_longer.rds")
 
 #select information questions only
 responses_longer <- responses_longer %>% filter(question %in% information_questions)
-
-#read in question_lookup_info
-question_lookup_info <- readRDS("lookups/question_lookup_info.rds")
 
 #define the aggregate information questions function.####
 aggregate_info <- function(report_areas,wt) {
@@ -139,8 +124,8 @@ info_output$report_area_name[info_output$level == "GPCL"] <- info_output$report_
 info_output <- info_output %>% select(-practice_name_letter,-practice_board_name,-practice_hscp_name)
 
 #add on completed forms and sample size####
-sample_size_list <- readRDS("output/temp/sample_size_list_net_of_deaths.rds")
-forms_completed_list <- readRDS("output/temp/forms_completed_list.rds")
+sample_size_list <- readRDS(paste0(data_path,"sample_size_list_net_of_deaths.rds"))
+forms_completed_list <- readRDS(paste0(data_path,"forms_completed_list.rds"))
 
 info_output <- left_join(info_output,forms_completed_list, by = c("level","report_area"))
 info_output <- left_join(info_output,sample_size_list, by = c("level","report_area"))
@@ -148,20 +133,21 @@ info_output <- info_output %>%
                 mutate(Response_Rate_perc = forms_completed / sample_pop * 100)
 
 ####add on historical data####
-info_questions_historical <- read_sav("/conf/bss/pat-exp-surveys/health-and-care/201920/Tableau/Datafiles/info_questions.sav")
+info_questions_historical <- read_sav(paste0(historical_file_path,"info_questions.sav"))
 ls(info_questions_historical,sorted = FALSE)
 table(info_questions_historical$Level)
 #take out GP and GP Cluster data
 info_questions_historical <- info_questions_historical %>% 
                             filter(!Level %in% c("GP","GPCL") )
 info_questions_historical$in_historical_file <- 1
-info_questions_historical <- info_questions_historical %>% select(-Forms_completed,-N_IncludedResponses,-Question_Type,-sample_size,
-                                                                  -SurveySection,-Question_text,-Response_Rate_perc,     
-                                                                  -sample_size,-SurveySection  )
-colnames(info_questions_historical)<-tolower(colnames(info_questions_historical)) 
-info_questions_historical$response_option <- as.character(info_questions_historical$responseoption)
+info_questions_historical <- info_questions_historical %>% 
+          mutate(in_historical_file = 1) %>% 
+          select(-Forms_completed,-N_IncludedResponses,-Question_Type,-sample_size,
+                   -SurveySection,-Question_text,-Response_Rate_perc, -sample_size,-SurveySection  ) %>% 
+          rename_with(tolower) %>% 
+          response_option <- as.character(responseoption)
 
-#Update info_questions_historical$question_2020 to include 'q':
+#Update info_questions_historical$question_2020 to include 'q': #ch - update these lines into dplyr if still needed
 info_questions_historical$question_2020 <- paste("q", info_questions_historical$question_2020, sep="")
 #update question_2020 in info_output for q11 (q11 in 2022) & q24 (q30 in 2022) to ensure full match up
 info_questions_historical$question_2020 [info_questions_historical$question_2020 == "q11" & info_questions_historical$response_option == "1" ] <- "q11a"
@@ -215,13 +201,13 @@ info_questions <- info_output_full %>%
 #info_output is intended to be a full version of the data
 info_output_full <- info_output_full %>% select(-in_historical_file,-responseoption,-response_texthist)
 info_output_full <- rename(info_output_full,"report_area_code"= "report_area")
-saveRDS(info_output_full, "output/analysis_output/info_output_full.rds")
-hist.file2 <- readRDS("output/analysis_output/info_output_full.rds")
+saveRDS(info_output_full, paste0(output_path,"info_output_full.rds"))
+hist.file2 <- readRDS(paste0(output_path,"info_output_full.rds"))
 identical(info_output_full,hist.file2)
 all.equal(info_output_full,hist.file2)
 table(info_output_full$report_area,useNA = c("always"))
 #check if the same as before
-hist.file <- readRDS("output/analysis_output/info_questions_sg.rds")
+hist.file <- readRDS(paste0(output_path,"info_questions_sg.rds"))
 hist.file <- hist.file %>% arrange(Level,Report_Area,Question_2022,ResponseOption)
 info_questions <- info_questions %>% arrange(Level,Report_Area,Question_2022,ResponseOption)
 identical(info_questions$N_Response_2020,hist.file$N_Response_2020)
@@ -232,10 +218,9 @@ attributes(hist.file$N_Response_2020)
 check <- if_else(info_questions$N_Response_2020 == hist.file$N_Response_2020,0,1)
 table(check)
 
-#save out for SG - filepath + name was originally "output/tableau/info_questions.rds" & "output/tableau/info_questions.xlsx"
-#file.remove("output/analysis_output/info_questions_sg.rds")
-saveRDS(info_questions, "output/analysis_output/info_questions_sg.rds")
-#file.remove("output/analysis_output/info_questions_sg.xlsx")
+#file.remove(paste0(output_path,"info_questions_sg.rds"))
+saveRDS(info_questions, paste0(output_path,"info_questions_sg.rds"))
+#file.remove(paste0(output_path,"info_questions_sg.xlsx"))
 
 
 

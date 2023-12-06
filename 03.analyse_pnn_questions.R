@@ -17,20 +17,9 @@
 #"output/temp/gpcl_pnn.rds"
 #"output/temp/gp_pnn.rds"
 
-# load in libraries
-library(tidyverse)
-#version 1.3.1
-library(srvyr)
-#version 1.2.0
-
-#Define directories
-setwd("/conf/bss/pat-exp-surveys/health-and-care/202324")
-###set vector of report areas
-report_areas <- c("scotland","gp_prac_no","practice_hscp_code","practice_board_code" ,"practice_hscp_cluster")
-report_areas_output <- c("Scotland","GP","HSCP","Health Board" ,"GPCL")
-
-###set vector of percent_positive_questions numbers
-percent_positive_questions <- readRDS("lookups/percent_positive_questions.rds")
+source("00.set_up_packages.R")
+source("00.set_up_file_paths.R")
+source("00.functions.R")
 
 #read in results longer data####
 responses_longer <- readRDS("output/analysis_output/responses_longer.rds")
