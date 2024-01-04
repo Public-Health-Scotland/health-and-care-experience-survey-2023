@@ -1,9 +1,16 @@
-# Written by x x x
-# November 2023.
-# Adapted from February 2022 code by Catriona Haddow
+# Name of file: 03.analyse_pnn_questions.R
+# 
+# Original author(s): Catriona Haddow
+#   
+# Written/run on: Posit Workbench - RStudio R 4.1.2
+# 
+# Description of content:  Analyse PNN questions. Read in responses longer, add response rates and output analyses at all levels of reporting.
+# 
+# Approximate run time: 15 min
+# 
+# Approximate memory usage: 1 GiB
 # 
 # *****************************************
-#Purpose: Analyse PNN questions. Read in responses longer, add response rates and output analyses at all levels of reporting.
 
 #Inputs: 
 #"lookups/percent_positive_questions.rds"
@@ -21,20 +28,16 @@ source("00.set_up_packages.R")
 source("00.set_up_file_paths.R")
 source("00.functions.R")
 
-#read in results longer data####
-responses_longer <- readRDS("output/analysis_output/responses_longer.rds")
+responses_longer <- readRDS(paste0(analysis_output_path,"responses_longer.rds")) #read in results longer data####
 
-#select pnn questions only
-responses_longer <- responses_longer %>% filter(question %in% percent_positive_questions)
+responses_longer <- responses_longer %>% 
+  filter(question %in% percent_positive_questions) %>% #select pnn questions only
+  mutate(scotland = "Scotland") #add new variable for reporting at national level
 
-#add new variable for reporting at national level
-responses_longer$scotland = "Scotland"
+question_lookup_pnn <- readRDS(paste0(lookup_path,"question_lookup_pnn.rds")) #read in question_lookup_pnn
 
-#read in question_lookup_pnn
-question_lookup_pnn <- readRDS("lookups/question_lookup_pnn.rds")
-
-question_lookup_pnn$response_option <- as.character(question_lookup_pnn$response_option)
-responses_longer <- left_join(responses_longer,select(question_lookup_pnn,-weight),by = c("question","response_option"))
+responses_longer <- responses_longer %>% 
+  left_join(select(question_lookup_pnn,-weight),by = c("question","response_option"))
 
 #check that these are all 'invalid' response combinations
 table(responses_longer$question[is.na(responses_longer$response_text) & responses_longer$response_option != '0'],
@@ -83,47 +86,47 @@ nat_pnn  <- lapply(seq_along(percent_positive_questions), function(x) {
 nat_pnn <- bind_rows(nat_pnn)
 nat_pnn <- nat_pnn %>% mutate(level = "Scotland") %>% rename("report_area" = "scotland")
 #check if the same as before
-hist.file <- readRDS("output/temp/nat_pnn.rds")
+hist.file <- readRDS(paste0(analysis_output_path,"nat_pnn.rds"))
 identical(hist.file,nat_pnn)
-file.remove("output/temp/nat_pnn.rds")
-saveRDS(nat_pnn,"output/temp/nat_pnn.rds")
+file.remove(paste0(analysis_output_path,"nat_pnn.rds"))
+saveRDS(nat_pnn,paste0(analysis_output_path,"nat_pnn.rds"))
 
 hb_pnn <- lapply(seq_along(percent_positive_questions), function(x) {
   aggregate_pnn(practice_board_code,hb_wt,x)})
 hb_pnn <- bind_rows(hb_pnn)
 hb_pnn <- hb_pnn %>% mutate(level = "Health Board") %>% rename("report_area" = "practice_board_code")
 #check if the same as before
-hist.file <- readRDS("output/temp/hb_pnn.rds")
+hist.file <- readRDS(paste0(analysis_output_path,"hb_pnn.rds"))
 identical(hist.file,hb_pnn)
-file.remove("output/temp/hb_pnn.rds")
-saveRDS(hb_pnn,"output/temp/hb_pnn.rds")
+file.remove(paste0(analysis_output_path,"hb_pnn.rds"))
+saveRDS(hb_pnn,paste0(analysis_output_path,"hb_pnn.rds"))
 
 hscp_pnn <- lapply(seq_along(percent_positive_questions), function(x) {
   aggregate_pnn(practice_hscp_code,hscp_wt,x)})
 hscp_pnn <- bind_rows(hscp_pnn)
 hscp_pnn <- hscp_pnn %>% mutate(level = "HSCP") %>% rename("report_area" = "practice_hscp_code")
 #check if the same as before
-hist.file <- readRDS("output/temp/hscp_pnn.rds")
+hist.file <- readRDS(paste0(analysis_output_path,"hscp_pnn.rds"))
 identical(hist.file,hscp_pnn)
-file.remove("output/temp/hscp_pnn.rds")
-saveRDS(hscp_pnn,"output/temp/hscp_pnn.rds")
+file.remove(paste0(analysis_output_path,"hscp_pnn.rds"))
+saveRDS(hscp_pnn,paste0(analysis_output_path,"hscp_pnn.rds"))
 
 gpcl_pnn <- lapply(seq_along(percent_positive_questions), function(x) {
   aggregate_pnn(practice_hscp_cluster,gpcl_wt,x)})
 gpcl_pnn <- bind_rows(gpcl_pnn)
 gpcl_pnn <- gpcl_pnn %>% mutate(level = "GPCL") %>% rename("report_area" = "practice_hscp_cluster")
 #check if the same as before
-hist.file <- readRDS("output/temp/gpcl_pnn.rds")
+hist.file <- readRDS(paste0(analysis_output_path,"gpcl_pnn.rds"))
 identical(hist.file,gpcl_pnn)
-file.remove("output/temp/gpcl_pnn.rds")
-saveRDS(gpcl_pnn,"output/temp/gpcl_pnn.rds")
+file.remove(paste0(analysis_output_path,"gpcl_pnn.rds"))
+saveRDS(gpcl_pnn,paste0(analysis_output_path,"gpcl_pnn.rds"))
 
 gp_pnn <- lapply(seq_along(percent_positive_questions), function(x) {
   aggregate_pnn(gp_prac_no,gp_wt,x)})
 gp_pnn <- bind_rows(gp_pnn)
 gp_pnn <- gp_pnn %>% mutate(level = "GP") %>% rename("report_area" = "gp_prac_no")
 #check if the same as before
-hist.file <- readRDS("output/temp/gp_pnn.rds")
+hist.file <- readRDS(paste0(analysis_output_path,"gp_pnn.rds"))
 identical(hist.file,gp_pnn)
-file.remove("output/temp/gp_pnn.rds")
-saveRDS(gp_pnn,"output/temp/gp_pnn.rds")
+file.remove(paste0(analysis_output_path,"gp_pnn.rds"))
+saveRDS(gp_pnn,paste0(analysis_output_path,"gp_pnn.rds"))

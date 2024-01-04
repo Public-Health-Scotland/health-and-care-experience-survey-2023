@@ -1,15 +1,19 @@
-# Written by x x x
-# November 2023.
-# Adapted from January 2022 code by Catriona Haddow
+# Name of file: 00.create_question_lookup.R
 # 
-# *****************************************
-#Purpose: Create information for each question
-
+# Original author(s): Catriona Haddow
+#   
+# Written/run on: Posit Workbench - RStudio R 4.1.2
+# 
+# Description of content:  Create metadata for each question in HACE survey
+# 
+# Approximate run time: <1 min
+# 
+# Approximate memory usage: 1.26 GiB
 
 #Inputs: #UPDATE!
 #"lookups/2022.04.19 ASDHD - Health and Care Experience Survey - 2021 - Questionnaire - mapping document - version 2.2.xlsx"
 
-#Outputs: #UPDATE!
+#Outputs:
 #"lookups/question_lookup_info.rds"
 #"lookups/question_lookup_pnn.rds"
 #"lookups/question_lookup.rds"
@@ -22,30 +26,35 @@ source("00.set_up_packages.R")
 source("00.set_up_file_paths.R")
 
 #Read in document
-Question_lookup <- read_xlsx(paste0(lookup_path,"ASDHD - Health and Care Experience Survey - 2023 - 2024.xlsx"),
+question_mapping <- read_xlsx(paste0(lookup_path,"ASDHD - Health and Care Experience Survey - 2023 - 2024.xlsx"),
                              sheet = "HACE 2023-24 wip",na = "", trim_ws = TRUE)
-Question_lookup <- Question_lookup %>%
+question_mapping <- question_mapping %>%
   mutate(across(everything(), as.character))%>%
   rename_with(tolower) %>% 
   rename(question = 'quest.no.',
-         question_text = 'question text') %>% 
+         question_text = 'question text',
+         question_type = `question type`) %>% 
   mutate('quest. no. prev year' = if_else((nchar(`quest. no. prev year`) == 1|substr(`quest. no. prev year`,1,1)==9), 
                                           paste0("q0",`quest. no. prev year`),
                                           paste0("q",`quest. no. prev year`)))
 
-table(Question_lookup$question[grepl("all that apply",Question_lookup$question_text) & nchar(Question_lookup$question) == 3],useNA = c("always"))
+#this needs to be corrected in original excel file
+tabyl(question_mapping[question_mapping$question == "q27f",],`response options`)
+question_mapping <- question_mapping %>%
+  mutate(`response options` = str_replace(`response options`,";7 = No,not had any help but I feel that I needed it;8 = No, I didn't need any help",""))
+
+table(question_mapping$question[grepl("all that apply",question_mapping$question_text) & nchar(question_mapping$question) == 3],useNA = c("always"))
 
 information_questions_tata <- c("q09","q14","q20","q27","q28","q32","q34","q35","q39") #manual input as question lookup formatting is not consistent
-table(Question_lookup$`response options`[substring(Question_lookup$question,1,3) %in% information_questions_tata])
-#this is dangerous, because "no" will get mapped as option 2! Recode later.
+table(question_mapping$`response options`[substring(question_mapping$question,1,3) %in% information_questions_tata])
 
-Question_lookup <- Question_lookup %>%
+question_mapping <- question_mapping %>%
   mutate(tata = if_else(substring(question,1,3) %in% information_questions_tata,1,0),
         `response options` = if_else(tata == 1,
-                                       paste0("1 = ",`response options`,"; 0 = No"),`response options`))
+                                       paste0("1 = ",`response options`,"; 0 = No"),`response options`)) #this is dangerous, because "no" will get mapped as option 2! Recode later.
 
-question_lookup_info <- Question_lookup %>%
-  filter(`question type` == "Information" | question == "q39")%>%
+question_lookup_info <- question_mapping %>%
+  filter(question_type == "Information" | question == "q39")%>%
   mutate('question_2022' = if_else(`comparability 2021-22` %in% c("Tableau","Commentary"),`quest. no. prev year`,""))%>%
   mutate('response_options' = str_replace_all(`response options`, "[0-9]+ = ", "")) %>%
   separate('response_options', into = c("R1","R2","R3","R4","R5","R6","R7","R8","R9","R10","R11"), sep = ";", extra = 'drop', remove = FALSE)%>%
@@ -63,8 +72,8 @@ identical(hist.file,question_lookup_info)
 
 saveRDS(question_lookup_info, paste0(lookup_path,"question_lookup_info.rds"))
 
-question_lookup_pnn <- Question_lookup %>%
-  filter(`question type` == "Percent positive")%>%
+question_lookup_pnn <- question_mapping %>%
+  filter(question_type == "Percent positive")%>%
   mutate(across(contains("values"),~ str_replace(.x," ",""))) %>% #remove spaces from values
   mutate('question_2022' = if_else(`comparability 2021-22` %in% c("Tableau","Commentary"),`quest. no. prev year`,""))%>%
   separate(`negative values`, into = c("negative values 1","negative values 2"), sep = ",", extra = 'drop', remove = FALSE)%>%
@@ -77,11 +86,10 @@ question_lookup_pnn <- Question_lookup %>%
 
 table(question_lookup_pnn$response_option)
 
-#check if the same as before
+#check if the same as before, then save
 hist.file <- readRDS(paste0(lookup_path,"question_lookup_pnn.rds"))
 identical(hist.file,question_lookup_pnn)
-
-file.remove("lookups/question_lookup_pnn.rds")
+file.remove(paste0(lookup_path,"question_lookup_pnn.rds")) # remove existing file
 saveRDS(question_lookup_pnn, paste0(lookup_path,"question_lookup_pnn.rds"))
 
 question_lookup <- bind_rows(question_lookup_info[question_lookup_info$question != "q38",],question_lookup_pnn)
@@ -92,9 +100,9 @@ identical(hist.file,question_lookup)
 saveRDS(question_lookup, paste0(lookup_path,"question_lookup.rds"))
 
 #create vectors of percent positive / information questions
-percent_positive_questions <- Question_lookup$question[Question_lookup$`question type` == "Percent positive" & Question_lookup$question != '48hr_ldp']
-information_questions <- Question_lookup$question[Question_lookup$`question type` == "Information"| Question_lookup$question == "q38"]
-questions <- Question_lookup$question[(Question_lookup$`question type` == "Percent positive"| Question_lookup$`question type` == "Information") & Question_lookup$question != '48hr_ldp']
+percent_positive_questions <- unique(question_lookup_pnn$question[question_lookup_pnn$question != '48hr_ldp'])
+information_questions <- question_mapping$question[question_mapping$question_type == "Information"| question_mapping$question == "q38"]
+questions <- question_mapping$question[(question_mapping$question_type %in% c("Percent positive","Information")) & question_mapping$question != '48hr_ldp']
 
 #check if the same as before
 hist.file <- readRDS(paste0(lookup_path,"questions.rds"))
