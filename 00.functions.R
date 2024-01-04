@@ -9,5 +9,3 @@ information_questions <- readRDS(paste0(lookup_path,"information_questions.rds")
 information_questions_tata <- readRDS(paste0(lookup_path,"information_questions_tata.rds"))
 percent_positive_questions <- readRDS(paste0(lookup_path,"percent_positive_questions.rds"))
 
-#read in question_lookup_info
-question_lookup_info <- readRDS(paste0(lookup_path,"question_lookup_info.rds"))

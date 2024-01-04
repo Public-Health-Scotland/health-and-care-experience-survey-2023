@@ -1,4 +1,4 @@
-# Name of file: 01.create_responses_longer.R
+# Name of file: 02.analyse_information_questions.R
 # 
 # Original author(s): Catriona Haddow
 #   
@@ -6,9 +6,9 @@
 # 
 # Description of content:  Analyse information questions. Read in responses, response rates and output analyses at all levels of reporting.
 # 
-# Approximate run time: 2 min
+# Approximate run time: 3 min
 # 
-# Approximate memory usage: 7 GiB
+# Approximate memory usage: 1 GiB
 # 
 # *****************************************
 
@@ -39,6 +39,8 @@ table(responses_longer$question,useNA = c("always"))
 
 #select information questions only
 responses_longer <- responses_longer %>% filter(question %in% information_questions)
+
+question_lookup_info <- readRDS(paste0(lookup_path,"question_lookup_info.rds")) #read in lookup for info questions
 
 #define the aggregate information questions function.####
 aggregate_info <- function(report_areas,wt) {

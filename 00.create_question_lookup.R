@@ -86,10 +86,9 @@ question_lookup_pnn <- question_mapping %>%
 
 table(question_lookup_pnn$response_option)
 
-#check if the same as before
+#check if the same as before, then save
 hist.file <- readRDS(paste0(lookup_path,"question_lookup_pnn.rds"))
 identical(hist.file,question_lookup_pnn)
-
 file.remove(paste0(lookup_path,"question_lookup_pnn.rds")) # remove existing file
 saveRDS(question_lookup_pnn, paste0(lookup_path,"question_lookup_pnn.rds"))
 
@@ -101,7 +100,7 @@ identical(hist.file,question_lookup)
 saveRDS(question_lookup, paste0(lookup_path,"question_lookup.rds"))
 
 #create vectors of percent positive / information questions
-percent_positive_questions <- question_mapping$question[question_mapping$question_type == "Percent positive" & question_mapping$question != '48hr_ldp']
+percent_positive_questions <- unique(question_lookup_pnn$question[question_lookup_pnn$question != '48hr_ldp'])
 information_questions <- question_mapping$question[question_mapping$question_type == "Information"| question_mapping$question == "q38"]
 questions <- question_mapping$question[(question_mapping$question_type %in% c("Percent positive","Information")) & question_mapping$question != '48hr_ldp']
 
