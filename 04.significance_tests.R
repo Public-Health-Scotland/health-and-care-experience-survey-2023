@@ -13,16 +13,16 @@
 # *****************************************
 
 #Inputs: 
-#"lookups/Final_Practice_lookup.rds"
-#"output/temp/output/temp/sample_size_list_net_of_deaths.rds"
-#"output/temp/forms_completed_list.rds"
-#"lookups/question_lookup_pnn.rds"
-#"output/temp/nat_pnn.rds"
-#"output/temp/hb_pnn.rds"
-#"output/temp/hscp_pnn.rds"
-#"output/temp/gpcl_pnn.rds"
-#"output/temp/gp_pnn.rds"
-#"output/temp/pnn_questions_historical.rds"
+#"lookups/Final_Practice_lookup.rds" - created as part of preparation work
+#"output/temp/output/temp/sample_size_list_net_of_deaths.rds" - created as part of preparation work
+#"output/temp/forms_completed_list.rds" -  - created in script 01.create_responses_longer
+#"lookups/question_lookup_pnn.rds" - created in script 00.create_question_lookup
+#"output/temp/nat_pnn.rds"- created in script 03.analyse_pnn_questions
+#"output/temp/hb_pnn.rds"- created in script 03.analyse_pnn_questions
+#"output/temp/hscp_pnn.rds"- created in script 03.analyse_pnn_questions
+#"output/temp/gpcl_pnn.rds"- created in script 03.analyse_pnn_questions
+#"output/temp/gp_pnn.rds"- created in script 03.analyse_pnn_questions
+#"output/temp/pnn_questions_historical.rds" - created in 2022
 
 #Outputs: 
 #"output/analysis_output/pnn_output_sg.rds"
@@ -160,4 +160,10 @@ file.remove(paste0(analysis_output_path,"pnn_output_sg.rds"))
 saveRDS(pnn_output_sg, paste0(analysis_output_path,"pnn_output_sg.rds"))
 file.remove(paste0(analysis_output_path,"pnn_output_sg.xlsx"))
 write.xlsx(pnn_output_sg, paste0(analysis_output_path,"pnn_output_sg.xlsx"))
+
+#remove unnecessary files
+pnn_subfiles <- dir(path =analysis_output_path,pattern='_pnn.rds')
+pnn_subfiles <- paste0(analysis_output_path,pnn_subfiles)
+file.remove(pnn_subfiles)
+
 
