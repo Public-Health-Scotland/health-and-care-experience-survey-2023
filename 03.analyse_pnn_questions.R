@@ -13,9 +13,9 @@
 # *****************************************
 
 #Inputs: 
-#"lookups/percent_positive_questions.rds"
-#"output/analysis_output/responses_longer.rds"
-#"lookups/question_lookup_pnn.rds"
+#"lookups/percent_positive_questions.rds" - created in script 00.create_question_lookup
+#"output/analysis_output/responses_longer.rds" - created in script 01.create_responses_longer
+#"lookups/question_lookup_pnn.rds"- created in script 00.create_question_lookup
 
 #Outputs: 
 #"output/temp/nat_pnn.rds"

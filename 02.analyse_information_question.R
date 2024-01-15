@@ -13,12 +13,12 @@
 # *****************************************
 
 #Inputs: 
-#"lookups/information_questions.rds"
-#"lookups/information_questions_tata.rds"
-#"output/analysis_output/responses_longer.rds"
-#"lookups/question_lookup_info.rds"
-#"lookups/Final_Practice_lookup.rds"
-#"output/temp/output/temp/sample_size_list_net_of_deaths.rds"
+#"lookups/information_questions.rds" - created in script 00.create_question_lookup
+#"lookups/information_questions_tata.rds" - created in script 00.create_question_lookup
+#"output/analysis_output/responses_longer.rds" - created in script 01.create_responses_longer
+#"lookups/question_lookup_info.rds"- created in script 00.create_question_lookup
+#"lookups/Final_Practice_lookup.rds"  - created as part of preparation work
+#"output/temp/output/temp/sample_size_list_net_of_deaths.rds" - ???
 #"output/temp/forms_completed_list.rds"
 #"/conf/bss/pat-exp-surveys/health-and-care/201920/Tableau/Datafiles/info_questions.sav"
 
