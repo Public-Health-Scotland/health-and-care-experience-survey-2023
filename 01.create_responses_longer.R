@@ -44,7 +44,7 @@ responses <- responses %>%
          q28 = max(q28a,q28b,q28c,q28d),
          q32 = max(q32a,q32b,q32c,q32d,q32e,q32f,q32g,q32h,q32i),
          q34 = max(q34a,q34b,q34c,q34d,q34e,q34f),
-         q35 = max(q35a,q35b,q35c,q35d,q35e,q35f,q35g),
+         q35 = max(q35a,q35b,q35c,q35d,q35e,q35f,q35g,q35h), #ML added q35h 15/2/24
          q39 = max(q39a,q39b,q39c,q39d,q39e,q39f,q39g,q39h,q39i,q39j,q39k))%>%
   mutate(across(q09a:q09f,~replace(., q09 != 1,NA)),
          across(q14a:q14f,~replace(., q14 != 1,NA)),
@@ -53,7 +53,7 @@ responses <- responses %>%
          across(q28a:q28d,~replace(., q28 != 1,NA)),
          across(q32a:q32i,~replace(., q32 != 1,NA)),
          across(q34a:q34f,~replace(., q34 != 1,NA)),
-         across(q35a:q35g,~replace(., q35 != 1,NA)),
+         across(q35a:q35h,~replace(., q35 != 1,NA)), #ML changed 'q35a:q35g' to 'q35a:q35h' 15/2/24
          across(q39a:q39k,~replace(., q39 != 1,NA))) %>% 
   ungroup()
 
