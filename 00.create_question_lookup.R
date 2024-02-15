@@ -38,10 +38,10 @@ question_mapping <- question_mapping %>%
                                           paste0("q0",`quest. no. prev year`),
                                           paste0("q",`quest. no. prev year`)))
 
-#this needs to be corrected in original excel file
-tabyl(question_mapping[question_mapping$question == "q27f",],`response options`)
-question_mapping <- question_mapping %>%
-  mutate(`response options` = str_replace(`response options`,";7 = No,not had any help but I feel that I needed it;8 = No, I didn't need any help",""))
+#this needs to be corrected in original excel file #ML FIXED IN FILE 15/02/24 TO BE REMOVED ONCE CONFIRMED.
+#tabyl(question_mapping[question_mapping$question == "q27f",],`response options`)
+#question_mapping <- question_mapping %>%
+#  mutate(`response options` = str_replace(`response options`,";7 = No,not had any help but I feel that I needed it;8 = No, I didn't need any help",""))
 
 table(question_mapping$question[grepl("all that apply",question_mapping$question_text) & nchar(question_mapping$question) == 3],useNA = c("always"))
 
@@ -54,7 +54,7 @@ question_mapping <- question_mapping %>%
                                        paste0("1 = ",`response options`,"; 0 = No"),`response options`)) #this is dangerous, because "no" will get mapped as option 2! Recode later.
 
 question_lookup_info <- question_mapping %>%
-  filter(question_type == "Information" | question == "q39")%>%
+  filter(question_type == "Information" | question == "q38")%>% #Updated from q39 to q38 (q39 was equivalent question in 2021/22)
   mutate('question_2022' = if_else(`comparability 2021-22` %in% c("Tableau","Commentary"),`quest. no. prev year`,""))%>%
   mutate('response_options' = str_replace_all(`response options`, "[0-9]+ = ", "")) %>%
   separate('response_options', into = c("R1","R2","R3","R4","R5","R6","R7","R8","R9","R10","R11"), sep = ";", extra = 'drop', remove = FALSE)%>%
