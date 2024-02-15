@@ -120,7 +120,7 @@ responses_longer <- responses_longer %>%
 #check if the same as before, then save new file
 hist.file <- readRDS(paste0(analysis_output_path,"responses_longer.rds"))
 identical(hist.file,responses_longer)
-file.remove(paste0(lookup_path,"question_lookup_pnn.rds")) # remove existing file
+file.remove(paste0(lookup_path,"responses_longer.rds")) # remove existing file #ML 15/02/24 Changed "question_lookup_pnn.rds" to "responses_longer.rds"
 saveRDS(responses_longer, paste0(analysis_output_path,"responses_longer.rds"))
 
 #calculate response rate = completed form count / sample size ####
