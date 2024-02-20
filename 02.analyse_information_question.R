@@ -151,9 +151,9 @@ info_output_full <- info_output %>%
 info_output_full <- info_output_full %>% 
   select(-in_historical_file,-response_texthist) %>%  #ch removed responseoption. Not sure why it was there
   rename("report_area_code"= "report_area")
-hist.file <- readRDS(paste0(output_path,"info_output_full.rds")) #ML 15/02/24 swapped round 'hist.file' & 'identical' with 'saveRDS' - in wrong order
+hist.file <- readRDS(paste0(analysis_output_path,"info_output_full.rds"))
 identical(info_output_full,hist.file)
-saveRDS(info_output_full, paste0(output_path,"info_output_full.rds"))
+saveRDS(info_output_full, paste0(analysis_output_path,"info_output_full.rds"))
 
 
 #Rename variables for consistency with previous files. Is this still needed?
@@ -172,7 +172,7 @@ info_questions <- info_output_full %>%
 
 #check if the same as before
 hist.file_sg <- readRDS(paste0(output_path,"info_questions_sg.rds"))
-hist.file_sg <- hist.file_sg %>% arrange(Level,Report_Area,Question_2024,ResponseOption) #ml 15/02/24 updated 'hist.file_sg <- hist.file' to 'hist.file_sg <- hist.file_sg'
+hist.file_sg <- hist.file_sg %>% arrange(Level,Report_Area,Question_2024,ResponseOption) 
 info_questions <- info_questions %>% arrange(Level,Report_Area,Question_2024,ResponseOption)
 identical(info_questions,hist.file_sg)
 #file.remove(paste0(output_path,"info_questions_sg.rds"))
