@@ -29,7 +29,7 @@ source("00.set_up_file_paths.R")
 source("00.functions.R")
 
 #read in results data####
-responses <- readRDS(paste0(analysis_output_path,"responses_with_categories.rds")) #ch - this is stored in the wrong place
+responses <- readRDS(paste0(analysis_output_path,"responses_with_categories.rds"))
 
 responses <- responses %>% mutate(scotland = "Scotland") #add new variable for reporting at national level
 table(responses$q09a,useNA = c("always"))
