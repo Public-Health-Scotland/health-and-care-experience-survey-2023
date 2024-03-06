@@ -20,7 +20,7 @@
 #"lookups/Final_Practice_lookup.rds"  - created as part of preparation work
 #"output/temp/output/temp/sample_size_list_net_of_deaths.rds" - ???
 #"output/temp/forms_completed_list.rds"
-#"/conf/bss/pat-exp-surveys/health-and-care/201920/Tableau/Datafiles/info_questions.sav"
+#"historical_data_path,"info_questions_sg.rds"
 
 #Outputs: 
 ##"output/analysis_output/info_questions_sg.rds"
