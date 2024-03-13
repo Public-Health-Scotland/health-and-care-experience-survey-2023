@@ -92,7 +92,7 @@ info_output <- info_output %>%
            wgt_percent_response= n_wgt_response / n_wgt_includedresponses * 100)
 
 #Code to deal with 'tick all that apply' questions.
-#Removes the "No" response to the "tick all that apply" questions q09a-f, q14a-f, q20a-f, q27a-h, q28a-d, q32a-i, q34a-f, q35a-g, a39a-k####
+#Removes the "No" response to the "tick all that apply" questions q09a-f, q14a-f, q20a-f, q27a-h, q28a-d, q32a-i, q34a-f, q35a-g, q39a-k####
 info_output <- info_output %>%
                filter(!(substr(question,1,3) %in% information_questions_tata & response_option == "0"))
 
@@ -145,18 +145,20 @@ info_questions_historical <- info_questions_historical %>%
 
 #join info_output and info_questions_historical
 info_output_full <- info_output %>% 
-        left_join(info_questions_historical,by = c("question_2022","response_option" = "responseoption","level","report_area_name"= "report_area"),suffix=c("2022","hist"))
+        left_join(info_questions_historical,by = c("question_2022","response_option" = "responseoption","level","report_area_name"= "report_area"),suffix=c("2024","hist")) %>%
+        rename("question_2024"="question")
 
 #info_output is intended to be a full version of the data
 info_output_full <- info_output_full %>% 
   select(-in_historical_file,-response_texthist) %>%  #ch removed responseoption. Not sure why it was there
   rename("report_area_code"= "report_area")
-saveRDS(info_output_full, paste0(output_path,"info_output_full.rds"))
-hist.file <- readRDS(paste0(output_path,"info_output_full.rds"))
+hist.file <- readRDS(paste0(output_path,"/analysis_output/info_output_full.rds"))
 identical(info_output_full,hist.file)
+saveRDS(info_output_full, paste0(output_path,"/analysis_output/info_output_full.rds"))
+
 
 #Rename variables for consistency with previous files. Is this still needed?
-oldnames <- c("level","report_area_name","question","question_text","surveysection","response_option","response_text2022",
+oldnames <- c("level","report_area_name","question_2024","question_text","surveysection","response_option","response_text2024",
               "n_includedresponses","n_response", "wgt_percent_response","n_response_2022","wgt_percent_response_2022","n_response_2020","wgt_percent_response_2020",
               "n_response_2018","wgt_percent_response_2018","n_response_2016","wgt_percent_response_2016",
               "n_response_2014","wgt_percent_response_2014","forms_completed","sample_pop","Response_Rate_perc")
@@ -170,13 +172,10 @@ info_questions <- info_output_full %>%
   select(all_of(newnames))
 
 #check if the same as before
-hist.file_sg <- readRDS(paste0(output_path,"info_questions_sg.rds"))
-hist.file_sg <- hist.file %>% arrange(Level,Report_Area,Question_2024,ResponseOption)
+hist.file_sg <- readRDS(paste0(output_path,"/analysis_output/info_questions_sg.rds"))
+hist.file_sg <- hist.file_sg %>% arrange(Level,Report_Area,Question_2024,ResponseOption)
 info_questions <- info_questions %>% arrange(Level,Report_Area,Question_2024,ResponseOption)
 identical(info_questions,hist.file_sg)
 #file.remove(paste0(output_path,"info_questions_sg.rds"))
-saveRDS(info_questions, paste0(output_path,"info_questions_sg.rds"))
+saveRDS(info_questions, paste0(output_path,"/analysis_output/info_questions_sg.rds"))
 #file.remove(paste0(output_path,"info_questions_sg.xlsx")) # do we need an excel version
-
-
-
