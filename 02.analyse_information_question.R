@@ -20,7 +20,7 @@
 #"lookups/Final_Practice_lookup.rds"  - created as part of preparation work
 #"output/temp/output/temp/sample_size_list_net_of_deaths.rds" - ???
 #"output/temp/forms_completed_list.rds"
-#"/conf/bss/pat-exp-surveys/health-and-care/201920/Tableau/Datafiles/info_questions.sav"
+#"historical_data_path,"info_questions_sg.rds"
 
 #Outputs: 
 ##"output/analysis_output/info_questions_sg.rds"
@@ -152,10 +152,10 @@ info_output_full <- info_output %>%
 info_output_full <- info_output_full %>% 
   select(-in_historical_file,-response_texthist) %>%  #ch removed responseoption. Not sure why it was there
   rename("report_area_code"= "report_area")
-hist.file <- readRDS(paste0(output_path,"/analysis_output/info_output_full.rds"))
-identical(info_output_full,hist.file)
-saveRDS(info_output_full, paste0(output_path,"/analysis_output/info_output_full.rds"))
 
+hist.file <- readRDS(paste0(analysis_output_path,"info_output_full.rds"))
+identical(info_output_full,hist.file)
+saveRDS(info_output_full, paste0(analysis_output_path,"info_output_full.rds"))
 
 #Rename variables for consistency with previous files. Is this still needed?
 oldnames <- c("level","report_area_name","question_2024","question_text","surveysection","response_option","response_text2024",
@@ -172,10 +172,11 @@ info_questions <- info_output_full %>%
   select(all_of(newnames))
 
 #check if the same as before
-hist.file_sg <- readRDS(paste0(output_path,"/analysis_output/info_questions_sg.rds"))
+hist.file_sg <- readRDS(paste0(analysis_output_path,"/info_questions_sg.rds"))
 hist.file_sg <- hist.file_sg %>% arrange(Level,Report_Area,Question_2024,ResponseOption)
+
 info_questions <- info_questions %>% arrange(Level,Report_Area,Question_2024,ResponseOption)
 identical(info_questions,hist.file_sg)
-#file.remove(paste0(output_path,"info_questions_sg.rds"))
-saveRDS(info_questions, paste0(output_path,"/analysis_output/info_questions_sg.rds"))
-#file.remove(paste0(output_path,"info_questions_sg.xlsx")) # do we need an excel version
+#file.remove(paste0(analysis_output_path,"info_questions_sg.rds"))
+saveRDS(info_questions, paste0(analysis_output_path,"/info_questions_sg.rds"))
+#file.remove(paste0(analysis_output_path,"info_questions_sg.xlsx")) # do we need an excel version
